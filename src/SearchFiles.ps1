@@ -20,7 +20,10 @@ Param(
 
 )
 
-$path = "C:\dev\PowerShellFileContentSearch\src"
+if($path.Length -eq 0){
+    $path = $PSScriptRoot
+}
+
 $resultSet = @()
 $resultsFile = $path + "\results.txt";
 
