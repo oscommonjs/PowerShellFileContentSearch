@@ -1,7 +1,7 @@
-#Remember to dot source the script file before you try to execute it in a powershell scenario
+#dot source the script if using outside the ISE
 
 Function SearchFiles{
-
+    
 Param(
     [ValidateScript({Test-Path $_ -PathType 'Container'})]
     [string]
@@ -18,22 +18,28 @@ Param(
     [bool]
     $out
 
+    #work this out in a future version
+    #[bool]
+    #$caseSensitive
+
 )
 
-if($path.Length -eq 0){
+If($path.Length -eq 0)
+{
     $path = $PSScriptRoot
 }
 
 $resultSet = @()
 $resultsFile = $path + "\results.txt";
 
-If($extension.ToLower() -eq "any"){
+If($extension.ToLower() -eq "any")
+{
     $extensionToSearch = "*.*";
 }
 Else{
+    $extension = $extension.Replace(".","");
     $extensionToSearch = "*." + $extension;
 }
-
 
 Get-ChildItem $Path -Filter $extensionToSearch -Recurse |
    Where-Object { $_.Attributes -ne "Directory"} |
@@ -43,19 +49,19 @@ Get-ChildItem $Path -Filter $extensionToSearch -Recurse |
          }
       }
 
-    If($resultSet.count -gt 0){
-        Write-Host "Files that meet search criteria:"
-        $resultSet | ForEach-Object {Write-Host $_ -ForegroundColor DarkGreen}
-    }
-    Else{
-        Write-Host "No results for '$text'" -ForegroundColor DarkRed
-    }
+If($resultSet.count -gt 0)
+{
+    Write-Host "Files that meet search criteria:"
+    $resultSet | ForEach-Object {Write-Host $_ -ForegroundColor DarkGreen}
+}
+Else{
+    Write-Host "No results for '$text'" -ForegroundColor DarkRed
+}
 
-    If($out)
-    {
-        $resultSet | % {$_} | Out-File $resultsFile
-    }
-    
+If($out)
+{
+    $resultSet | % {$_} | Out-File $resultsFile
+}
 
 }
 
