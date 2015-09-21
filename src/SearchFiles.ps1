@@ -18,13 +18,21 @@ Param(
     [bool]
     $out
 
-
 )
+
 $path = "C:\dev\PowerShellFileContentSearch\src"
 $resultSet = @()
 $resultsFile = $path + "\results.txt";
 
-Get-ChildItem $Path -Filter "*.txt" |
+If($extension.ToLower() -eq "any"){
+    $extensionToSearch = "*.*";
+}
+Else{
+    $extensionToSearch = "*." + $extension;
+}
+
+
+Get-ChildItem $Path -Filter $extensionToSearch -Recurse |
    Where-Object { $_.Attributes -ne "Directory"} |
       ForEach-Object {
          If (Get-Content $_.FullName | Select-String -Pattern $text) {
@@ -32,18 +40,19 @@ Get-ChildItem $Path -Filter "*.txt" |
          }
       }
 
-If($out)
-{
-    $resultSet | % {$_} | Out-File $resultsFile
-}
-
-
-    Write-Host "Files that meet search criteria:"
-
-    $resultSet | ForEach-Object {Write-Host $_ -ForegroundColor DarkGreen}
-    If($resultSet.count -eq 0){
-        Write-Host "No results that met the search criteria" -ForegroundColor DarkRed
+    If($resultSet.count -gt 0){
+        Write-Host "Files that meet search criteria:"
+        $resultSet | ForEach-Object {Write-Host $_ -ForegroundColor DarkGreen}
     }
+    Else{
+        Write-Host "No results for '$text'" -ForegroundColor DarkRed
+    }
+
+    If($out)
+    {
+        $resultSet | % {$_} | Out-File $resultsFile
+    }
+    
 
 }
 
